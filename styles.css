@@ -453,3 +453,152 @@ input:checked + .slider:before {
     transition: transform 0.6s;
     transform-style: preserve-3d;
 }
+
+/* Enhanced Flashcard Styling */
+#flashcard {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    color: var(--light);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.flashcard-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.flashcard-front {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.8), rgba(16, 185, 129, 0.8));
+    color: white;
+    transform: rotateY(0deg);
+}
+
+.flashcard-back {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(79, 70, 229, 0.8));
+    color: white;
+    transform: rotateY(180deg);
+}
+
+#flashcard.is-flipped .flashcard-front {
+    transform: rotateY(-180deg);
+}
+
+#flashcard.is-flipped .flashcard-back {
+    transform: rotateY(0deg);
+}
+
+/* Style for navigation buttons */
+#flashcard-controls button {
+    min-width: 120px;
+    justify-content: center;
+}
+
+#dont-know-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+#dont-know-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+#know-btn {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+#know-btn:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+/* Enhanced Add Flashcard Form Styling */
+#add-flashcard-form {
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+    padding: 24px;
+    color: var(--light);
+}
+
+#add-flashcard-form h3 {
+    color: var(--primary-light);
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#add-flashcard-form label {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: var(--gray);
+}
+
+#add-flashcard-form input[type="text"],
+#add-flashcard-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: var(--light);
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none;
+    resize: vertical; /* Allow vertical resizing for textarea */
+}
+
+#add-flashcard-form input[type="text"]::placeholder,
+#add-flashcard-form textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+#add-flashcard-form input[type="text"]:focus,
+#add-flashcard-form textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+}
+
+#add-flashcard-form textarea {
+    min-height: 100px;
+}
+
+#add-flashcard-form #add-flashcard-btn {
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+
+#add-flashcard-form #add-flashcard-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
