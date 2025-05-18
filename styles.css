@@ -602,3 +602,143 @@ input:checked + .slider:before {
     opacity: 0.9;
     transform: translateY(-2px);
 }
+
+/* Enhanced Flashcard Management Styling */
+#flashcard-management-card .glass {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+}
+
+#flashcard-management-card h2 {
+    margin-bottom: 16px;
+}
+
+#flashcard-list-container {
+    max-height: 300px; /* Adjust height as needed */
+    overflow-y: auto;
+    padding-right: 10px; /* Add padding for scrollbar */
+}
+
+#flashcard-list-container .glass-light {
+    background: rgba(255, 255, 255, 0.08); /* Subtle background for list items */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 12px; /* Space between items */
+    padding: 15px;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+}
+
+#flashcard-list-container .glass-light:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+#flashcard-list-container .glass-light .font-semibold {
+    color: var(--primary-light);
+    margin-bottom: 4px;
+}
+
+#flashcard-list-container .glass-light .text-gray-700 {
+    color: var(--gray); /* Use a theme gray variable */
+    font-size: 0.9rem;
+}
+
+#flashcard-list-container .glass-light .flex.justify-end {
+    margin-top: 10px;
+}
+
+#flashcard-list-container .glass-light button {
+    background: none;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+#flashcard-list-container .glass-light button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+#flashcard-list-container .glass-light .edit-flashcard-btn {
+    color: var(--info); /* Use info color for edit */
+}
+
+#flashcard-list-container .glass-light .delete-flashcard-btn {
+    color: var(--danger); /* Use danger color for delete */
+}
+
+#open-add-flashcard-modal-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 20px; /* Space above the button */
+}
+
+/* Enhanced Flashcard Intro Styling */
+#flashcard-intro {
+    background: rgba(255, 255, 255, 0.08); /* Subtle background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 30px 20px; /* Increased padding */
+    text-align: center;
+    color: var(--light);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+#flashcard-intro .fas {
+    color: var(--secondary); /* Use a vibrant theme color for the icon */
+    margin-bottom: 20px; /* More space below icon */
+    font-size: 4rem; /* Larger icon */
+    text-shadow: 0 0 15px rgba(16, 185, 129, 0.6); /* Subtle glow */
+}
+
+#flashcard-intro p {
+    font-size: 1.4rem; /* Larger, more prominent text */
+    font-weight: 500;
+    margin-bottom: 25px; /* More space below text */
+    color: var(--light); /* Ensure text color is readable */
+}
+
+#flashcard-intro #try-flashcards-btn {
+    background: linear-gradient(90deg, var(--primary), var(--accent)); /* Vibrant gradient */
+    color: white;
+    font-weight: 600;
+    padding: 12px 30px; /* Larger padding for a more substantial button */
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    margin-bottom: 15px; /* Space below the first button */
+}
+
+#flashcard-intro #try-flashcards-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+}
+
+#flashcard-intro #try-flashcards-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+
+#flashcard-intro #add-custom-flashcard {
+    background: rgba(255, 255, 255, 0.1); /* More subtle button */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--light);
+    font-weight: 500;
+    padding: 10px 25px; /* Slightly less padding than the primary button */
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+#flashcard-intro #add-custom-flashcard:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
