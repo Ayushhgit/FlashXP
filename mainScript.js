@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sounds: true,
             reminders: false
         },
-        visualizationType: 2 // 0 = mountain, 1 = spiral, 2 = path
+        visualizationType: 0 // 0 = mountain, 1 = spiral, 2 = path
     };
 
     // DOM Elements
@@ -105,7 +105,26 @@ document.addEventListener('DOMContentLoaded', function() {
         breakTimeDisplay: document.getElementById('break-time-display'),
         startPomodoro: document.getElementById('start-pomodoro'),
         pausePomodoro: document.getElementById('pause-pomodoro'),
-        resetPomodoro: document.getElementById('reset-pomodoro')
+        resetPomodoro: document.getElementById('reset-pomodoro'),
+        // Flashcard Elements
+        flashcardIntro: document.getElementById('flashcard-intro'),
+        tryFlashcardsBtn: document.getElementById('try-flashcards-btn'),
+        flashcardViewer: document.getElementById('flashcard-viewer'),
+        flashcard: document.getElementById('flashcard'),
+        flashcardFrontContent: document.getElementById('flashcard-front-content'),
+        flashcardBackContent: document.getElementById('flashcard-back-content'),
+        knowBtn: document.getElementById('know-btn'),
+        dontKnowBtn: document.getElementById('dont-know-btn'),
+        revealAnswerBtn: document.getElementById('reveal-answer-btn'),
+        // Add Flashcard Form Elements
+        addFlashcardForm: document.getElementById('add-flashcard-form'),
+        toggleAddFlashcardBtn: document.getElementById('toggle-add-flashcard'),
+        newFlashcardFrontInput: document.getElementById('new-flashcard-front'),
+        newFlashcardBackInput: document.getElementById('new-flashcard-back'),
+        addFlashcardBtn: document.getElementById('add-flashcard-btn'),
+        // Flashcard Management Elements
+        flashcardListContainer: document.getElementById('flashcard-list-container'),
+        openAddFlashcardModalBtn: document.getElementById('open-add-flashcard-modal-btn')
     };
 
     // Initialize charts
@@ -601,105 +620,207 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', handleResize);
 
     // Pomodoro Timer Functionality
-    let pomodoroInterval;
-    let pomodoroSeconds = 25 * 60; // 25 minutes
-    let pomodoroMode = 'work'; // 'work' or 'break'
-    let pomodoroRunning = false;
+    class PomodoroTimer {
+        constructor() {
+            this.workTime = 25 * 60; // 25 minutes in seconds
+            this.breakTime = 5 * 60; // 5 minutes in seconds
+            this.timeLeft = this.workTime;
+            this.isRunning = false;
+            this.isPaused = false;
+            this.mode = 'work'; // 'work' or 'break'
+            this.interval = null;
+            this.startTime = null;
+            this.pauseTime = null;
 
-    function updatePomodoroDisplay() {
-        const minutes = Math.floor(pomodoroSeconds / 60);
-        const seconds = pomodoroSeconds % 60;
-        elements.pomodoroTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
+            // Initialize UI
+            this.initializeUI();
+        }
 
-    function startPomodoro() {
-        if (pomodoroRunning) return;
-        
-        pomodoroRunning = true;
-        elements.startPomodoro.disabled = true;
-        elements.pausePomodoro.disabled = false;
-        
-        if (pomodoroMode === 'work') {
-            elements.pomodoroStatus.textContent = 'Focus time';
+        initializeUI() {
+            // Set initial values
+            elements.workTime.value = '25';
+            elements.breakTime.value = '5';
+            elements.workTimeDisplay.textContent = '25 min';
+            elements.breakTimeDisplay.textContent = '5 min';
+            
+            // Add event listeners
+            elements.startPomodoro.addEventListener('click', () => this.start());
+            elements.pausePomodoro.addEventListener('click', () => this.pause());
+            elements.resetPomodoro.addEventListener('click', () => this.reset());
+            
+            elements.workTime.addEventListener('input', (e) => {
+                const minutes = parseInt(e.target.value);
+                elements.workTimeDisplay.textContent = `${minutes} min`;
+                this.setWorkTime(minutes);
+            });
+            
+            elements.breakTime.addEventListener('input', (e) => {
+                const minutes = parseInt(e.target.value);
+                elements.breakTimeDisplay.textContent = `${minutes} min`;
+                this.setBreakTime(minutes);
+            });
+
+            // Initial display
+            this.updateDisplay();
+            this.updateStatus();
+        }
+
+        start() {
+            if (this.isRunning) return;
+            
+            this.isRunning = true;
+            this.isPaused = false;
+            this.startTime = Date.now();
+            
+            elements.startPomodoro.disabled = true;
+            elements.pausePomodoro.disabled = false;
+            elements.resetPomodoro.disabled = false;
+            
+            this.updateDisplay();
+            this.updateStatus();
+            
+            this.interval = setInterval(() => this.tick(), 1000);
+        }
+
+        pause() {
+            if (!this.isRunning) return;
+            
+            if (!this.isPaused) {
+                this.isPaused = true;
+                this.pauseTime = Date.now();
+                clearInterval(this.interval);
+                elements.pausePomodoro.innerHTML = '<i class="fas fa-play mr-2"></i> Resume';
+                elements.pomodoroStatus.textContent = 'Paused';
+            } else {
+                this.isPaused = false;
+                const pauseDuration = Math.floor((Date.now() - this.pauseTime) / 1000);
+                this.startTime += pauseDuration * 1000;
+                this.interval = setInterval(() => this.tick(), 1000);
+                elements.pausePomodoro.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+                this.updateStatus();
+            }
+        }
+
+        reset() {
+            clearInterval(this.interval);
+            this.isRunning = false;
+            this.isPaused = false;
+            this.mode = 'work';
+            this.timeLeft = this.workTime;
+            
+            elements.startPomodoro.disabled = false;
+            elements.pausePomodoro.disabled = true;
+            elements.resetPomodoro.disabled = true;
+            elements.pausePomodoro.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause';
+            elements.pomodoroStatus.textContent = 'Ready to start';
             elements.pomodoroTimer.classList.add('text-primary');
             elements.pomodoroTimer.classList.remove('text-green-500');
-        } else {
-            elements.pomodoroStatus.textContent = 'Break time';
-            elements.pomodoroTimer.classList.add('text-green-500');
-            elements.pomodoroTimer.classList.remove('text-primary');
-        }
-        
-        pomodoroInterval = setInterval(() => {
-            pomodoroSeconds--;
-            updatePomodoroDisplay();
             
-            if (pomodoroSeconds <= 0) {
-                clearInterval(pomodoroInterval);
+            this.updateDisplay();
+        }
+
+        tick() {
+            const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+            this.timeLeft = Math.max(0, (this.mode === 'work' ? this.workTime : this.breakTime) - elapsed);
+            
+            this.updateDisplay();
+            
+            if (this.timeLeft <= 0) {
+                this.switchMode();
+            }
+        }
+
+        switchMode() {
+            clearInterval(this.interval);
+            
+            if (this.mode === 'work') {
+                this.mode = 'break';
+                this.timeLeft = this.breakTime;
+                this.startTime = Date.now();
                 
-                if (pomodoroMode === 'work') {
-                    pomodoroMode = 'break';
-                    pomodoroSeconds = parseInt(elements.breakTime.value) * 60;
-                    elements.pomodoroStatus.textContent = 'Break time';
-                    elements.pomodoroTimer.classList.add('text-green-500');
-                    elements.pomodoroTimer.classList.remove('text-primary');
-                    
-                    // Increment pomodoro completed count
-                    state.pomodoroCompleted++;
-                    updateStorage();
-                    
-                    // Check for Time Master achievement
-                    if (state.pomodoroCompleted >= 5 && !state.achievements.timeMaster) {
-                        state.achievements.timeMaster = true;
-                        showAchievement('Time Master', 'You completed 5 Pomodoro cycles!', 'fa-clock');
-                        updateAchievementDisplay();
-                    }
-                    
-                    // Show notification
-                    showNotification('Break Time!', 'Good job! Take a short break now.', 'fa-coffee');
-                } else {
-                    pomodoroMode = 'work';
-                    pomodoroSeconds = parseInt(elements.workTime.value) * 60;
-                    elements.pomodoroStatus.textContent = 'Focus time';
-                    elements.pomodoroTimer.classList.add('text-primary');
-                    elements.pomodoroTimer.classList.remove('text-green-500');
-                    
-                    // Show notification
-                    showNotification('Focus Time!', 'Break is over. Time to get back to work!', 'fa-brain');
+                // Increment pomodoro completed count
+                state.pomodoroCompleted++;
+                updateStorage();
+                
+                // Check for Time Master achievement
+                if (state.pomodoroCompleted >= 5 && !state.achievements.timeMaster) {
+                    state.achievements.timeMaster = true;
+                    showAchievement('Time Master', 'You completed 5 Pomodoro cycles!', 'fa-clock');
+                    updateAchievementDisplay();
                 }
                 
-                updatePomodoroDisplay();
-                
+                // Show notification and play sound
+                showNotification('Break Time!', 'Good job! Take a short break now.', 'fa-coffee');
                 if (state.settings.sounds) {
                     playSound('timer');
                 }
+            } else {
+                this.mode = 'work';
+                this.timeLeft = this.workTime;
+                this.startTime = Date.now();
                 
-                startPomodoro();
+                // Show notification and play sound
+                showNotification('Focus Time!', 'Break is over. Time to get back to work!', 'fa-brain');
+                if (state.settings.sounds) {
+                    playSound('timer');
+                }
             }
-        }, 1000);
+            
+            this.updateDisplay();
+            this.updateStatus();
+            this.interval = setInterval(() => this.tick(), 1000);
+        }
+
+        updateDisplay() {
+            const minutes = Math.floor(this.timeLeft / 60);
+            const seconds = this.timeLeft % 60;
+            elements.pomodoroTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        updateStatus() {
+            if (this.mode === 'work') {
+                elements.pomodoroStatus.textContent = 'Focus time';
+                elements.pomodoroTimer.classList.add('text-primary');
+                elements.pomodoroTimer.classList.remove('text-green-500');
+            } else {
+                elements.pomodoroStatus.textContent = 'Break time';
+                elements.pomodoroTimer.classList.add('text-green-500');
+                elements.pomodoroTimer.classList.remove('text-primary');
+            }
+        }
+
+        setWorkTime(minutes) {
+            this.workTime = minutes * 60;
+            if (!this.isRunning) {
+                this.timeLeft = this.workTime;
+                this.updateDisplay();
+            }
+        }
+
+        setBreakTime(minutes) {
+            this.breakTime = minutes * 60;
+        }
     }
 
-    function pausePomodoro() {
-        if (!pomodoroRunning) return;
-        
-        clearInterval(pomodoroInterval);
-        pomodoroRunning = false;
-        elements.startPomodoro.disabled = false;
-        elements.pausePomodoro.disabled = true;
-        elements.pomodoroStatus.textContent = 'Paused';
-    }
+    // Initialize Pomodoro Timer when DOM is loaded
+    const pomodoroTimer = new PomodoroTimer();
 
-    function resetPomodoro() {
-        clearInterval(pomodoroInterval);
-        pomodoroRunning = false;
-        pomodoroMode = 'work';
-        pomodoroSeconds = parseInt(elements.workTime.value) * 60;
-        elements.startPomodoro.disabled = false;
-        elements.pausePomodoro.disabled = true;
-        elements.pomodoroStatus.textContent = 'Ready to start';
-        elements.pomodoroTimer.classList.add('text-primary');
-        elements.pomodoroTimer.classList.remove('text-green-500');
-        updatePomodoroDisplay();
-    }
+    // Event Listeners
+    elements.startPomodoro.addEventListener('click', () => pomodoroTimer.start());
+    elements.pausePomodoro.addEventListener('click', () => pomodoroTimer.pause());
+    elements.resetPomodoro.addEventListener('click', () => pomodoroTimer.reset());
+
+    elements.workTime.addEventListener('input', function() {
+        const minutes = parseInt(this.value);
+        elements.workTimeDisplay.textContent = `${minutes} min`;
+        pomodoroTimer.setWorkTime(minutes);
+    });
+
+    elements.breakTime.addEventListener('input', function() {
+        const minutes = parseInt(this.value);
+        elements.breakTimeDisplay.textContent = `${minutes} min`;
+        pomodoroTimer.setBreakTime(minutes);
+    });
 
     // Progress Ring Functionality
     function setProgress(percent) {
@@ -985,34 +1106,55 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateCharts() {
         // Time Analysis Chart
-        if (timeAnalysisChart && state.levelHistory.length > 0) {
-            const labels = state.levelHistory.map((_, i) => `Level ${i + 1}`);
-            const data = state.levelHistory.map(level => (level.timeTaken / 60).toFixed(1)); // Convert to minutes
-            
+        if (timeAnalysisChart && state.maxLevel > 0) {
+            let labels = [];
+            let data = [];
+            if (state.currentLevel > 0) {
+                // Dummy data for Time Analysis after first level up
+                labels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'];
+                data = [15, 18, 12, 20, 17]; // Dummy times in minutes
+            } else {
+                labels = state.levelHistory.map((_, i) => `Level ${i + 1}`);
+                data = state.levelHistory.map(level => (level.timeTaken / 60).toFixed(1)); // Convert to minutes
+            }
+
             timeAnalysisChart.data.labels = labels;
             timeAnalysisChart.data.datasets[0].data = data;
             timeAnalysisChart.update();
         }
-        
+
         // Progress Trend Chart
-        if (progressTrendChart && state.levelHistory.length > 0) {
-            // Calculate metrics
-            const consistency = calculateConsistency();
-            const efficiency = calculateEfficiency();
-            const completionRate = (state.currentLevel / state.maxLevel) * 100;
-            const focus = state.pomodoroCompleted * 10; // Rough estimation based on pomodoro completions
-            const speed = calculateSpeed();
-            
-            progressTrendChart.data.datasets[0].data = [
-                Math.min(consistency, 100),
-                Math.min(efficiency, 100),
-                Math.min(completionRate, 100),
-                Math.min(focus, 100),
-                Math.min(speed, 100)
-            ];
+        if (progressTrendChart && state.maxLevel > 0) {
+            let radarData = [50, 50, 50, 50, 50]; // Default or initial data
+            if (state.currentLevel > 0) {
+                // Dummy data for Progress Trends after first level up
+                radarData = [
+                    Math.min(calculateConsistency(), 100), // Keep consistency calculation
+                    Math.min(calculateEfficiency(), 100), // Keep efficiency calculation
+                    Math.min((state.currentLevel / state.maxLevel) * 100, 100), // Keep completion rate
+                    Math.min(state.pomodoroCompleted * 15, 100), // Dummy focus based on pomodoro
+                    Math.min(calculateSpeed() * 1.2, 100) // Dummy speed increase
+                ];
+            } else {
+                 // Calculate metrics for initial state if needed or keep defaults
+                 const consistency = calculateConsistency();
+                 const efficiency = calculateEfficiency();
+                 const completionRate = (state.currentLevel / state.maxLevel) * 100;
+                 const focus = state.pomodoroCompleted * 10;
+                 const speed = calculateSpeed();
+                 radarData = [
+                     Math.min(consistency, 100),
+                     Math.min(efficiency, 100),
+                     Math.min(completionRate, 100),
+                     Math.min(focus, 100),
+                     Math.min(speed, 100)
+                 ];
+            }
+
+            progressTrendChart.data.datasets[0].data = radarData;
             progressTrendChart.update();
         }
-        
+
         // Performance Chart (already updated in updateLevelDisplay)
     }
 
@@ -1708,4 +1850,164 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.remove('text-gray-400');
         });
     });
+
+    // Flashcard Functionality
+    let flashcards = [
+        { front: 'What is the capital of France?', back: 'Paris' },
+        { front: 'What is the square root of 144?', back: '12' },
+        { front: 'What is the chemical symbol for water?', back: 'H2O' },
+        { front: 'Who wrote Hamlet?', back: 'William Shakespeare' },
+        { front: 'What is the largest planet in our solar system?', back: 'Jupiter' }
+    ];
+    let currentFlashcardIndex = 0;
+
+    function showFlashcard(index) {
+        if (index < 0 || index >= flashcards.length) {
+            // Handle end of flashcards (e.g., show completion message or loop)
+            elements.flashcardFrontContent.textContent = 'End of Flashcards!';
+            elements.flashcardBackContent.textContent = 'Great Job!';
+            elements.knowBtn.disabled = true;
+            elements.dontKnowBtn.disabled = true;
+            elements.revealAnswerBtn.disabled = true;
+            return;
+        }
+        
+        const card = flashcards[index];
+        elements.flashcardFrontContent.textContent = card.front;
+        elements.flashcardBackContent.textContent = card.back;
+        
+        // Hide navigation buttons and show reveal button initially
+        elements.knowBtn.classList.add('hidden');
+        elements.dontKnowBtn.classList.add('hidden');
+        elements.revealAnswerBtn.classList.remove('hidden');
+    }
+
+    elements.tryFlashcardsBtn.addEventListener('click', function() {
+        elements.flashcardIntro.classList.add('hidden');
+        elements.flashcardViewer.classList.remove('hidden');
+        currentFlashcardIndex = 0;
+        showFlashcard(currentFlashcardIndex);
+    });
+
+    // Add event listener for Reveal Answer button
+    elements.revealAnswerBtn.addEventListener('click', function() {
+        elements.flashcard.classList.add('is-flipped'); // Add class to trigger flip
+        // Hide reveal button and show navigation buttons
+        elements.revealAnswerBtn.classList.add('hidden');
+        elements.knowBtn.classList.remove('hidden');
+        elements.dontKnowBtn.classList.remove('hidden');
+    });
+
+    elements.knowBtn.addEventListener('click', function() {
+        currentFlashcardIndex++;
+        showFlashcard(currentFlashcardIndex);
+        elements.flashcard.classList.remove('is-flipped'); // Remove class for next card
+    });
+
+    elements.dontKnowBtn.addEventListener('click', function() {
+        // For simplicity, 'Don't Know' also moves to the next card for now
+        // In a real app, you might move it to a 'review' pile or similar
+        currentFlashcardIndex++;
+        showFlashcard(currentFlashcardIndex);
+        elements.flashcard.classList.remove('is-flipped'); // Remove class for next card
+    });
+
+    // Add Flashcard Form Functionality
+    elements.toggleAddFlashcardBtn.addEventListener('click', function() {
+        elements.addFlashcardForm.classList.toggle('hidden');
+    });
+
+    elements.addFlashcardBtn.addEventListener('click', function() {
+        const front = elements.newFlashcardFrontInput.value.trim();
+        const back = elements.newFlashcardBackInput.value.trim();
+        
+        if (front && back) {
+            flashcards.push({ front, back });
+            showNotification('Flashcard Added', 'Your new flashcard has been added.', 'fa-check-circle');
+            
+            // Clear form
+            elements.newFlashcardFrontInput.value = '';
+            elements.newFlashcardBackInput.value = '';
+            
+            // Optionally hide form
+            elements.addFlashcardForm.classList.add('hidden');
+            
+            // If currently viewing flashcards, reset to show the first card (including the new one)
+            if (!elements.flashcardViewer.classList.contains('hidden')) {
+                currentFlashcardIndex = 0;
+                showFlashcard(currentFlashcardIndex);
+            }
+            renderFlashcardList(); // Update the list in the management section
+        } else {
+            showNotification('Input Required', 'Please enter both a question and an answer.', 'fa-exclamation-circle');
+        }
+    });
+
+    // Flashcard Management Functionality
+    function renderFlashcardList() {
+        const container = elements.flashcardListContainer;
+        container.innerHTML = ''; // Clear current list
+        
+        if (flashcards.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-gray-400 py-4">
+                    <i class="fas fa-cards text-3xl mb-2"></i>
+                    <p>Your custom flashcards will appear here</p>
+                </div>
+            `;
+            return;
+        }
+        
+        flashcards.forEach((card, index) => {
+            const flashcardElement = document.createElement('div');
+            flashcardElement.classList.add('glass-light', 'bg-opacity-10', 'p-3', 'rounded-lg', 'mb-2', 'text-sm');
+            flashcardElement.innerHTML = `
+                <div class="font-semibold mb-1">Q: ${card.front}</div>
+                <div class="text-gray-700">A: ${card.back}</div>
+                <div class="flex justify-end space-x-2 mt-2">
+                    <button class="edit-flashcard-btn text-primary hover:text-primary-light" data-index="${index}">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="delete-flashcard-btn text-red-500 hover:text-red-600" data-index="${index}">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            `;
+            container.appendChild(flashcardElement);
+        });
+        
+        // Add event listeners for edit and delete buttons
+        container.querySelectorAll('.edit-flashcard-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                // TODO: Implement edit functionality (e.g., populate form, open modal)
+                showNotification('Edit', `Edit flashcard at index ${index}`, 'fa-edit');
+            });
+        });
+        
+        container.querySelectorAll('.delete-flashcard-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                deleteFlashcard(index);
+            });
+        });
+    }
+
+    function deleteFlashcard(index) {
+        if (confirm('Are you sure you want to delete this flashcard?')) {
+            flashcards.splice(index, 1);
+            showNotification('Flashcard Deleted', 'The flashcard has been removed.', 'fa-trash');
+            renderFlashcardList();
+            // TODO: Also update the main flashcard viewer if necessary
+        }
+    }
+
+    elements.openAddFlashcardModalBtn.addEventListener('click', function() {
+        // For now, just toggle the existing add flashcard form
+        elements.addFlashcardForm.classList.toggle('hidden');
+        // In a more complex app, you might open a dedicated modal here
+    });
+
+    // Initial render of flashcard list on page load
+    renderFlashcardList();
 });

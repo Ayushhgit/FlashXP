@@ -11,7 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
-    <script src="assets/js/pomodoro.js"></script>
     <link href="styles.css" rel="stylesheet">
 </head>
 <body>
@@ -273,6 +272,75 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Flashcard Card -->
+                <div class="glass p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold exo">Flashcards</h2>
+                        <div class="tooltip">
+                            <i class="fas fa-info-circle text-gray-400"></i>
+                            <span class="tooltip-text text-sm">Test your knowledge with interactive flashcards</span>
+                        </div>
+                    </div>
+                    
+                    <div id="flashcard-container" class="flex flex-col items-center">
+                        <!-- Initial State -->
+                        <div id="flashcard-intro" class="text-center py-8">
+                            <i class="fas fa-cards text-4xl text-primary mb-4"></i>
+                            <p class="text-lg mb-4">Ready to test yourself?</p>
+                            <button id="try-flashcards-btn" class="glass-btn py-2 px-4 rounded text-primary font-medium btn-animated">
+                                Try the Flashcards
+                            </button>
+                        </div>
+                        
+                        <!-- Flashcard Viewer (Hidden Initially) -->
+                        <div id="flashcard-viewer" class="hidden w-full max-w-sm perspective-1000">
+                            <div id="flashcard" class="relative w-full h-60 rounded-lg shadow-lg cursor-pointer preserve-3d">
+                                <div class="flashcard-face flashcard-front absolute w-full h-full bg-gray-800 rounded-lg flex items-center justify-center p-4 text-center backface-hidden">
+                                    <span id="flashcard-front-content" class="text-xl font-semibold">Front of Card</span>
+                                </div>
+                                <div class="flashcard-face flashcard-back absolute w-full h-full bg-blue-800 rounded-lg flex items-center justify-center p-4 text-center rotate-y-180 backface-hidden">
+                                    <span id="flashcard-back-content" class="text-xl font-semibold">Back of Card</span>
+                                </div>
+                            </div>
+                            
+                            <div id="flashcard-controls" class="flex justify-center space-x-4 mt-4">
+                                <button id="reveal-answer-btn" class="glass-btn py-2 px-4 rounded text-primary font-medium btn-animated">
+                                    <i class="fas fa-eye mr-2"></i> Reveal Answer
+                                </button>
+                                <button id="dont-know-btn" class="hidden glass-btn py-2 px-4 rounded text-red-500 font-medium btn-animated">
+                                    <i class="fas fa-times-circle mr-2"></i> Don't Know
+                                </button>
+                                <button id="know-btn" class="hidden glass-btn py-2 px-4 rounded text-green-500 font-medium btn-animated">
+                                    <i class="fas fa-check-circle mr-2"></i> Know
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Add Flashcard Form (Hidden Initially) -->
+                        <div id="add-flashcard-form" class="hidden w-full max-w-sm mt-6 glass-light bg-opacity-10 p-4 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-4">Add New Flashcard</h3>
+                            <div class="mb-4">
+                                <label for="new-flashcard-front" class="block text-sm font-medium mb-1">Question</label>
+                                <input type="text" id="new-flashcard-front" class="bg-transparent border border-gray-600 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter question">
+                            </div>
+                            <div class="mb-4">
+                                <label for="new-flashcard-back" class="block text-sm font-medium mb-1">Answer</label>
+                                <textarea id="new-flashcard-back" class="bg-transparent border border-gray-600 rounded p-2 w-full h-20 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter answer"></textarea>
+                            </div>
+                            <div class="flex justify-end">
+                                <button id="add-flashcard-btn" class="glass-btn py-2 px-4 rounded text-primary font-medium btn-animated">
+                                    Add Flashcard
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Button to Toggle Add Flashcard Form -->
+                        <button id="toggle-add-flashcard" class="glass-btn py-2 px-4 rounded text-primary font-medium btn-animated mt-4">
+                            <i class="fas fa-plus mr-2"></i> Add Custom Flashcard
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <!-- Right Column - History, Achievements, AI Recommendations -->
@@ -366,6 +434,31 @@
                             <div class="text-sm font-medium">Goal Crusher</div>
                             <div class="text-xs text-gray-400">Complete all levels</div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Flashcard Management Card -->
+                <div class="glass p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold exo">Flashcard Management</h2>
+                        <div class="tooltip">
+                            <i class="fas fa-info-circle text-gray-400"></i>
+                            <span class="tooltip-text text-sm">Manage your custom flashcards</span>
+                        </div>
+                    </div>
+                    
+                    <div id="flashcard-list-container" class="custom-scrollbar max-h-60 overflow-y-auto space-y-3">
+                        <!-- Flashcard list will be rendered here by JavaScript -->
+                        <div class="text-center text-gray-400 py-4">
+                            <i class="fas fa-cards text-3xl mb-2"></i>
+                            <p>Your custom flashcards will appear here</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex justify-center">
+                         <button id="open-add-flashcard-modal-btn" class="glass-btn py-2 px-4 rounded text-primary font-medium btn-animated">
+                            <i class="fas fa-plus mr-2"></i> Add New Flashcard
+                        </button>
                     </div>
                 </div>
             </div>
@@ -567,6 +660,8 @@
     <!-- Canvas for Confetti -->
     <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50 hidden"></canvas>
 
+    <!-- Main Script -->
+    <script src="mainScript.js"></script>
    
 </body>
 </html>
