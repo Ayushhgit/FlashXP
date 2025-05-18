@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#0f172a]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamXP - Level Up Your Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Loader Overlay -->
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        <div class="loading-text" id="loading-text">Loading your dashboard...</div>
+    </div>
+
+    <!-- Header -->
+    <header class="py-6">
+        <div class="container flex items-center justify-between">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">ExamXP</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#features" class="text-gray-300 hover:text-white transition-colors">Features</a>
+                <a href="#testimonials" class="text-gray-300 hover:text-white transition-colors">Testimonials</a>
+                <a href="#cta" class="text-gray-300 hover:text-white transition-colors">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-16 md:py-28">
+        <div class="container">
+            <div class="flex flex-col-reverse md:flex-row items-center justify-between">
+                <div class="md:w-1/2 text-center md:text-left" data-aos="fade-right">
+                    <h2 class="hero-title text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-500 text-transparent bg-clip-text">Welcome to ExamXP</h2>
+                    <div class="typing-container mb-8 h-8">
+                        <div class="typing-text" id="typing-text">Level up your learning</div>
+                    </div>
+                    <p class="text-gray-300 mb-10 text-lg">The ultimate gamified study tracker that helps you maintain consistency and achieve your academic goals.</p>
+                    <button id="launch-btn" class="glow-button text-lg px-8 py-4">Launch Tracker →</button>
+                </div>
+                <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-left">
+                    <div class="glass p-5 rounded-xl">
+                        <div class="bg-gray-800 rounded-lg overflow-hidden shadow-2xl" style="box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);">
+                            <div class="p-2 bg-gray-900 flex items-center">
+                                <div class="flex space-x-2">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                                <div class="ml-4 text-xs text-gray-400">ExamXP Dashboard</div>
+                            </div>
+                            <div class="p-4 text-sm text-gray-400">
+                                <div class="flex items-center justify-between mb-6">
+                                    <div class="text-lg text-white">Study Progress</div>
+                                    <div class="text-blue-400">Today: 2hr 15min</div>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>Data Structures</span>
+                                            <span>75%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                            <div class="bg-blue-500 h-2.5 rounded-full" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>Compiler Design</span>
+                                            <span>60%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                            <div class="bg-purple-500 h-2.5 rounded-full" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between mb-1">
+                                            <span>Machine Learning</span>
+                                            <span>90%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                            <div class="bg-teal-500 h-2.5 rounded-full" style="width: 90%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-6 flex items-center">
+                                    <div class="flex items-center">
+                                        <div class="text-yellow-500 mr-2"><i class="fas fa-fire"></i></div>
+                                        <span>12 Day Streak</span>
+                                    </div>
+                                    <div class="ml-auto flex items-center">
+                                        <div class="text-green-500 mr-2"><i class="fas fa-trophy"></i></div>
+                                        <span>420 XP</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 md:py-24">
+        <div class="container">
+            <h2 class="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text" data-aos="fade-up">Powerful Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card glass p-6" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="feature-icon mx-auto">
+                        <i class="fas fa-gamepad text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center mb-4">🎯 Gamified Progress</h3>
+                    <p class="text-gray-300 text-center">Earn XP, unlock achievements, and maintain streaks as you study to stay motivated.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="feature-card glass p-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="feature-icon mx-auto">
+                        <i class="fas fa-clock text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center mb-4">⏱️ Smart Time Tracking</h3>
+                    <p class="text-gray-300 text-center">Effortlessly track your study sessions with intelligent time management tools.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="feature-card glass p-6" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="feature-icon mx-auto">
+                        <i class="fas fa-chart-line text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center mb-4">📊 Visual Dashboards</h3>
+                    <p class="text-gray-300 text-center">Visualize your progress with beautiful charts and comprehensive analytics.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="feature-card glass p-6" data-aos="zoom-in" data-aos-delay="400">
+                    <div class="feature-icon mx-auto">
+                        <i class="fas fa-calendar-check text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center mb-4">📅 Daily Streaks & Goals</h3>
+                    <p class="text-gray-300 text-center">Set and achieve daily study goals to build consistent learning habits.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-16 md:py-24">
+        <div class="container">
+            <h2 class="text-4xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text" data-aos="fade-up">Student Success Stories</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card glass p-8 rounded-xl" data-aos="fade-up" data-aos-delay="100">
+                    <p class="text-gray-300 mb-6">ExamXP has completely transformed how I study. The gamification aspect makes learning fun, and I've improved my grades significantly!</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">JM</div>
+                        <div class="ml-4">
+                            <h4 class="font-medium text-white">Jessica Miller</h4>
+                            <p class="text-sm text-gray-400">Computer Science Student</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card glass p-8 rounded-xl" data-aos="fade-up" data-aos-delay="200">
+                    <p class="text-gray-300 mb-6">The visual dashboards help me identify which subjects need more focus. I love the streak feature - it keeps me consistent!</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">AT</div>
+                        <div class="ml-4">
+                            <h4 class="font-medium text-white">Alex Thompson</h4>
+                            <p class="text-sm text-gray-400">Medical Student</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card glass p-8 rounded-xl" data-aos="fade-up" data-aos-delay="300">
+                    <p class="text-gray-300 mb-6">As someone who struggled with procrastination, ExamXP has been a game-changer. The XP system motivates me to study every day!</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold">RJ</div>
+                        <div class="ml-4">
+                            <h4 class="font-medium text-white">Ryan Johnson</h4>
+                            <p class="text-sm text-gray-400">Engineering Student</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="cta" class="py-16 md:py-24">
+        <div class="container">
+            <div class="glass p-12 rounded-3xl text-center" data-aos="fade-up">
+                <h2 class="text-4xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">Ready to Level Up?</h2>
+                <p class="text-xl text-gray-300 mb-10 max-w-xl mx-auto">Join thousands of students who are transforming their study habits and achieving academic excellence with ExamXP.</p>
+                <button id="cta-btn" class="glow-button text-lg px-10 py-4">Start Your Journey</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="container">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">ExamXP</h2>
+                    <p class="text-gray-400 mt-2">Level up your learning journey</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-8 text-center text-gray-500 text-sm">
+                <p>&copy; 2023 ExamXP. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Typing effect
+        const texts = [
+            "Level up your learning",
+            "Track. Improve. Conquer.",
+            "Study smarter, not harder."
+        ];
+        let textIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 100;
+        const typingElement = document.getElementById('typing-text');
+
+        function typeText() {
+            const currentText = texts[textIndex];
+            
+            if (isDeleting) {
+                typingElement.textContent = currentText.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = 50;
+            } else {
+                typingElement.textContent = currentText.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 100;
+            }
+
+            if (!isDeleting && charIndex === currentText.length) {
+                isDeleting = true;
+                typingSpeed = 1500; // Pause at the end
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                textIndex = (textIndex + 1) % texts.length;
+                typingSpeed = 500; // Pause before typing next text
+            }
+
+            setTimeout(typeText, typingSpeed);
+        }
+
+        // Start typing effect
+        window.addEventListener('load', typeText);
+
+        // Loading animation
+        const loaderOverlay = document.getElementById('loader');
+        const progressBar = document.getElementById('progress');
+        const loadingText = document.getElementById('loading-text');
+        const launchButtons = [document.getElementById('launch-btn'), document.getElementById('cta-btn')];
+
+        launchButtons.forEach(button => {
+            if (button) {
+                button.addEventListener('click', function() {
+                    // Show loader
+                    loaderOverlay.style.display = 'flex';
+                    
+                    // Animation for progress bar
+                    let width = 0;
+                    const interval = setInterval(function() {
+                        if (width >= 100) {
+                            clearInterval(interval);
+                            // Redirect after 5 seconds
+                            setTimeout(function() {
+                                window.location.href = 'tracker.html';
+                            }, 500);
+                        } else {
+                            width += 2;
+                            progressBar.style.width = width + '%';
+                            
+                            // Update loading text at certain points
+                            if (width === 20) {
+                                loadingText.textContent = "Preparing your dashboard...";
+                            } else if (width === 50) {
+                                loadingText.textContent = "Loading study data...";
+                            } else if (width === 80) {
+                                loadingText.textContent = "Almost there...";
+                            }
+                        }
+                    }, 100);
+                });
+            }
+        });
+
+        // Simple parallax effect
+        document.addEventListener('mousemove', function(e) {
+            const blobs = document.querySelectorAll('.blob');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            blobs.forEach((blob, index) => {
+                const speed = (index + 1) * 15;
+                const xOffset = (x - 0.5) * speed;
+                const yOffset = (y - 0.5) * speed;
+                blob.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
+<!-- End of HTML Document -->
