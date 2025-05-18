@@ -30,8 +30,10 @@
                         <div id="avatar-container" class="avatar-container mr-4">
                             <div id="avatar-placeholder" class="avatar-placeholder"></div>
                         </div>
-                        <div>
-                            <div id="username" class="font-medium">Study Master</div>
+                        <!-- Editable Username -->
+                        <div id="username-editable" class="ml-4">
+                            <div id="username-display" class="font-medium cursor-pointer">Enter Name</div>
+                            <input type="text" id="username-input" placeholder="Enter your name" class="bg-transparent border border-gray-600 rounded p-1 w-full focus:outline-none focus:ring-2 focus:ring-primary text-sm hidden">
                             <div id="user-streak" class="text-sm text-gray-400">
                                 <span class="streak-display">0</span> day streak
                             </div>
@@ -40,20 +42,25 @@
                     <div class="glass p-2 flex items-center rounded-lg">
                         <div class="hidden sm:flex items-center mr-4">
                             <span class="mr-2 text-sm">Theme:</span>
-                            <select id="theme-selector" class="bg-transparent border border-gray-600 rounded p-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value="dark">Dark</option>
-                                <option value="light">Light</option>
-                                <option value="neon">Neon</option>
-                                <option value="minimalist">Minimalist</option>
-                                <option value="nature">Nature</option>
-                            </select>
+                            <!-- Custom Theme Selector -->
+                            <div id="custom-theme-selector" class="relative inline-block">
+                                <div id="custom-theme-display" class="glass-btn py-1.5 px-3 rounded-md text-sm flex items-center cursor-pointer">
+                                    <span id="selected-theme-name">Dark</span>
+                                    <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-300"></i>
+                                </div>
+                                <div id="custom-theme-options" class="glass absolute top-full mt-2 left-0 w-36 rounded-lg shadow-lg z-10 opacity-0 invisible transition-all duration-300 transform origin-top scale-95">
+                                    <div class="py-1 custom-scrollbar max-h-40 overflow-y-auto">
+                                        <div class="custom-theme-option px-4 py-2 text-sm cursor-pointer hover:bg-gray-700 transition-colors" data-value="dark">Dark</div>
+                                        <div class="custom-theme-option px-4 py-2 text-sm cursor-pointer hover:bg-gray-700 transition-colors" data-value="light">Light</div>
+                                        <div class="custom-theme-option px-4 py-2 text-sm cursor-pointer hover:bg-gray-700 transition-colors" data-value="neon">Neon</div>
+                                        <div class="custom-theme-option px-4 py-2 text-sm cursor-pointer hover:bg-gray-700 transition-colors" data-value="minimalist">Minimalist</div>
+                                        <div class="custom-theme-option px-4 py-2 text-sm cursor-pointer hover:bg-gray-700 transition-colors" data-value="nature">Nature</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <button id="settings-btn" class="p-2 rounded-full hover:bg-gray-700 transition-all">
                             <i class="fas fa-cog"></i>
-                        </button>
-                        <button id="notification-btn" class="p-2 rounded-full hover:bg-gray-700 transition-all ml-2 relative">
-                            <i class="fas fa-bell"></i>
-                            <span id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
                         </button>
                     </div>
                 </div>
@@ -85,11 +92,6 @@
                                     Set Goal
                                 </button>
                             </div>
-                        </div>
-                        
-                        <div class="mb-4" id="profile-container">
-                            <label for="username-input" class="block text-sm font-medium mb-1">Your Name</label>
-                            <input type="text" id="username-input" placeholder="Enter your name" class="bg-transparent border border-gray-600 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-primary">
                         </div>
                         
                         <div class="mb-4">
@@ -226,7 +228,14 @@
                             <canvas id="performance-chart-canvas"></canvas>
                         </div>
                     </div>
-                    
+
+                    <!-- Chart Placeholder Message -->
+                    <div id="chart-placeholder" class="text-center text-gray-400 py-10 hidden">
+                        <i class="fas fa-chart-area text-5xl mb-4"></i>
+                        <p class="text-lg font-semibold mb-2">No Data Available Yet</p>
+                        <p class="text-sm">Level up at least once to see your progress charts!</p>
+                    </div>
+
                     <div class="mt-4 text-sm text-gray-400">
                         <p id="analytics-insight">Complete your first level to generate analytics insights.</p>
                     </div>
@@ -659,6 +668,36 @@
 
     <!-- Canvas for Confetti -->
     <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50 hidden"></canvas>
+
+    <!-- Flashcard Edit Modal -->
+    <div id="edit-flashcard-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="glass p-6 rounded-xl w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold exo">Edit Flashcard</h2>
+                <button id="close-edit-flashcard-modal" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="edit-flashcard-front" class="block text-sm font-medium mb-1">Question</label>
+                    <input type="text" id="edit-flashcard-front" class="bg-transparent border border-gray-600 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter question">
+                </div>
+                
+                <div>
+                    <label for="edit-flashcard-back" class="block text-sm font-medium mb-1">Answer</label>
+                    <textarea id="edit-flashcard-back" class="bg-transparent border border-gray-600 rounded p-2 w-full h-20 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter answer"></textarea>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button id="save-flashcard-changes-btn" class="glass-btn py-2 px-6 rounded text-primary font-medium btn-animated">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Script -->
     <script src="mainScript.js"></script>

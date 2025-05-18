@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
         progressRing: document.querySelector('.progress-ring__circle'),
         historyContainer: document.getElementById('history-container'),
         avatarPlaceholder: document.getElementById('avatar-placeholder'),
-        usernameDisplay: document.getElementById('username'),
+        usernameDisplay: document.getElementById('username-display'),
         usernameInput: document.getElementById('username-input'),
         userStreak: document.querySelector('.streak-display'),
         examNameInput: document.getElementById('exam-name'),
@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         analyticsInsight: document.getElementById('analytics-insight'),
         tabBtns: document.querySelectorAll('.tab-btn'),
         chartTabs: document.querySelectorAll('.chart-tab'),
+        chartPlaceholder: document.getElementById('chart-placeholder'),
         aiRecommendations: document.getElementById('ai-recommendations'),
         canvasContainer: document.getElementById('canvas-container'),
         resetCameraBtn: document.getElementById('reset-camera-btn'),
@@ -124,7 +125,21 @@ document.addEventListener('DOMContentLoaded', function() {
         addFlashcardBtn: document.getElementById('add-flashcard-btn'),
         // Flashcard Management Elements
         flashcardListContainer: document.getElementById('flashcard-list-container'),
-        openAddFlashcardModalBtn: document.getElementById('open-add-flashcard-modal-btn')
+        openAddFlashcardModalBtn: document.getElementById('open-add-flashcard-modal-btn'),
+        // Custom Theme Selector Elements
+        customThemeSelector: document.getElementById('custom-theme-selector'),
+        customThemeDisplay: document.getElementById('custom-theme-display'),
+        selectedThemeName: document.getElementById('selected-theme-name'),
+        customThemeOptions: document.querySelectorAll('.custom-theme-option'),
+        themeArrowIcon: document.querySelector('#custom-theme-display .fas'),
+        // Flashcard Edit Modal Elements
+        editFlashcardModal: document.getElementById('edit-flashcard-modal'),
+        closeEditFlashcardModal: document.getElementById('close-edit-flashcard-modal'),
+        editFlashcardFrontInput: document.getElementById('edit-flashcard-front'),
+        editFlashcardBackInput: document.getElementById('edit-flashcard-back'),
+        saveFlashcardChangesBtn: document.getElementById('save-flashcard-changes-btn'),
+        // Daily Study Tip Elements
+        studyTipText: document.getElementById('study-tip-text')
     };
 
     // Initialize charts
@@ -1104,58 +1119,61 @@ document.addEventListener('DOMContentLoaded', function() {
         generateAIInsight();
     }
 
+    // Debugging: Log state and chart visibility in updateCharts
+    console.log('Running updateCharts...');
+    console.log('levelHistory length:', state.levelHistory.length);
+
     function updateCharts() {
-        // Time Analysis Chart
-        if (timeAnalysisChart && state.maxLevel > 0) {
-            let labels = [];
-            let data = [];
-            if (state.currentLevel > 0) {
-                // Dummy data for Time Analysis after first level up
-                labels = ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5'];
-                data = [15, 18, 12, 20, 17]; // Dummy times in minutes
-            } else {
-                labels = state.levelHistory.map((_, i) => `Level ${i + 1}`);
-                data = state.levelHistory.map(level => (level.timeTaken / 60).toFixed(1)); // Convert to minutes
+        console.log('Executing updateCharts...');
+
+        if (state.levelHistory.length > 0) {
+            console.log('Level history exists. Hiding placeholder, showing charts container.');
+            // Hide the placeholder message
+            elements.chartPlaceholder.classList.add('hidden');
+
+            // Show the container that holds the charts
+            document.querySelector('.charts-container').classList.remove('hidden');
+
+            // Also ensure the individual chart canvases are displayed (redundant but safe)
+            document.querySelectorAll('.charts-container canvas').forEach(canvas => canvas.style.display = 'block');
+
+            // Update Time Analysis Chart
+            if (timeAnalysisChart) { // Check if chart is initialized
+                const labels = state.levelHistory.map((_, i) => `Level ${i + 1}`);
+                const data = state.levelHistory.map(level => (level.timeTaken / 60).toFixed(1)); // Convert to minutes
+
+                timeAnalysisChart.data.labels = labels;
+                timeAnalysisChart.data.datasets[0].data = data;
+                timeAnalysisChart.update();
             }
 
-            timeAnalysisChart.data.labels = labels;
-            timeAnalysisChart.data.datasets[0].data = data;
-            timeAnalysisChart.update();
-        }
+            // Update Progress Trend Chart
+            if (progressTrendChart && state.maxLevel > 0) { // Need maxLevel for some calculations
+                const consistency = calculateConsistency();
+                const efficiency = calculateEfficiency();
+                const completionRate = (state.currentLevel / state.maxLevel) * 100;
+                const focus = state.pomodoroCompleted * 10; // Rough estimation
+                const speed = calculateSpeed();
 
-        // Progress Trend Chart
-        if (progressTrendChart && state.maxLevel > 0) {
-            let radarData = [50, 50, 50, 50, 50]; // Default or initial data
-            if (state.currentLevel > 0) {
-                // Dummy data for Progress Trends after first level up
-                radarData = [
-                    Math.min(calculateConsistency(), 100), // Keep consistency calculation
-                    Math.min(calculateEfficiency(), 100), // Keep efficiency calculation
-                    Math.min((state.currentLevel / state.maxLevel) * 100, 100), // Keep completion rate
-                    Math.min(state.pomodoroCompleted * 15, 100), // Dummy focus based on pomodoro
-                    Math.min(calculateSpeed() * 1.2, 100) // Dummy speed increase
-                ];
-            } else {
-                 // Calculate metrics for initial state if needed or keep defaults
-                 const consistency = calculateConsistency();
-                 const efficiency = calculateEfficiency();
-                 const completionRate = (state.currentLevel / state.maxLevel) * 100;
-                 const focus = state.pomodoroCompleted * 10;
-                 const speed = calculateSpeed();
-                 radarData = [
-                     Math.min(consistency, 100),
-                     Math.min(efficiency, 100),
-                     Math.min(completionRate, 100),
-                     Math.min(focus, 100),
-                     Math.min(speed, 100)
-                 ];
+                const radarData = [
+                    Math.min(consistency, 100),
+                    Math.min(efficiency, 100),
+                    Math.min(completionRate, 100),
+                    Math.min(focus, 100),
+                    Math.min(speed, 100)
+                ].map(value => parseFloat(value.toFixed(1))); // Cap and format
+
+                progressTrendChart.data.datasets[0].data = radarData;
+                progressTrendChart.update();
             }
 
-            progressTrendChart.data.datasets[0].data = radarData;
-            progressTrendChart.update();
-        }
+            // Performance Chart is updated in updateLevelDisplay (uses real data)
 
-        // Performance Chart (already updated in updateLevelDisplay)
+        } else {
+            console.log('levelHistory === 0: Showing placeholder, hiding charts container');
+            elements.chartPlaceholder.classList.remove('hidden');
+            document.querySelector('.charts-container').classList.add('hidden');
+        }
     }
 
     function calculateConsistency() {
@@ -1603,6 +1621,21 @@ document.addEventListener('DOMContentLoaded', function() {
             performanceChart.options.plugins.legend.labels.color = chartTextColor;
             performanceChart.update();
         }
+        
+        // Update selected theme name in custom selector
+        if (elements.selectedThemeName) {
+            const selectedOptionText = Array.from(elements.customThemeOptions).find(option => option.dataset.value === theme)?.textContent || theme;
+            elements.selectedThemeName.textContent = selectedOptionText;
+            
+            // Update selected class on options
+            elements.customThemeOptions.forEach(option => {
+                if (option.dataset.value === theme) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
     }
 
     function playSound(type) {
@@ -1658,16 +1691,57 @@ document.addEventListener('DOMContentLoaded', function() {
         state.userName = this.value;
         elements.usernameDisplay.textContent = state.userName || 'Study Master';
         
-        // Update avatar
-        if (state.userName) {
-            const initials = state.userName.split(' ').map(name => name[0]).join('').toUpperCase();
-            elements.avatarPlaceholder.textContent = initials;
+        // Update avatar in real-time
+        if (this.value) {
+            const firstLetter = this.value.charAt(0).toUpperCase();
+            elements.avatarPlaceholder.textContent = firstLetter;
         } else {
             elements.avatarPlaceholder.textContent = '';
         }
         
         updateStorage();
     });
+
+    // Add event listener to toggle username edit
+    elements.usernameDisplay.addEventListener('click', function() {
+        elements.usernameDisplay.classList.add('hidden');
+        elements.usernameInput.classList.remove('hidden');
+        elements.usernameInput.focus(); // Focus the input field
+        elements.usernameInput.value = state.userName; // Load current name into input
+        elements.usernameInput.select(); // Select all text for easy editing
+    });
+
+    // Add event listener to save username on blur (when input loses focus)
+    elements.usernameInput.addEventListener('blur', function() {
+        saveUsername();
+    });
+
+    // Add event listener for Enter key press
+    elements.usernameInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default form submission
+            saveUsername();
+        }
+    });
+
+    // Function to save username
+    function saveUsername() {
+        const newName = elements.usernameInput.value.trim();
+        state.userName = newName || 'Study Master'; // Use default if empty
+        elements.usernameDisplay.textContent = state.userName;
+
+        // Update avatar
+        if (state.userName && state.userName !== 'Study Master') {
+            const initials = state.userName.split(' ').map(name => name[0]).join('').toUpperCase();
+            elements.avatarPlaceholder.textContent = initials;
+        } else {
+            elements.avatarPlaceholder.textContent = '';
+        }
+
+        updateStorage(); // Save to storage
+        elements.usernameDisplay.classList.remove('hidden');
+        elements.usernameInput.classList.add('hidden');
+    }
     
     elements.examNameInput.addEventListener('input', function() {
         state.examName = this.value;
@@ -1737,19 +1811,10 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification('Goal Added', 'Your new study goal has been added.', 'fa-check-circle');
     });
     
-    elements.themeSelector.addEventListener('change', function() {
-        const theme = this.value;
-        applyTheme(theme);
-        state.settings.theme = theme;
-        elements.themeSelect.value = theme;
-        updateStorage();
-    });
-    
     elements.themeSelect.addEventListener('change', function() {
         const theme = this.value;
         applyTheme(theme);
         state.settings.theme = theme;
-        elements.themeSelector.value = theme;
         updateStorage();
     });
     
@@ -1852,14 +1917,30 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Flashcard Functionality
-    let flashcards = [
-        { front: 'What is the capital of France?', back: 'Paris' },
-        { front: 'What is the square root of 144?', back: '12' },
-        { front: 'What is the chemical symbol for water?', back: 'H2O' },
-        { front: 'Who wrote Hamlet?', back: 'William Shakespeare' },
-        { front: 'What is the largest planet in our solar system?', back: 'Jupiter' }
-    ];
+    let flashcards = []; // Initialize as empty, load from storage
     let currentFlashcardIndex = 0;
+    let editingFlashcardIndex = null; // To store the index of the flashcard being edited
+
+    function loadFlashcards() {
+        const savedFlashcards = localStorage.getItem('flashcards');
+        if (savedFlashcards) {
+            flashcards = JSON.parse(savedFlashcards);
+        } else {
+             // Default flashcards if none saved
+            flashcards = [
+                { front: 'What is the capital of France?', back: 'Paris' },
+                { front: 'What is the square root of 144?', back: '12' },
+                { front: 'What is the chemical symbol for water?', back: 'H2O' },
+                { front: 'Who wrote Hamlet?', back: 'William Shakespeare' },
+                { front: 'What is the largest planet in our solar system?', back: 'Jupiter' }
+            ];
+        }
+        renderFlashcardList(); // Render list after loading
+    }
+
+    function saveFlashcards() {
+        localStorage.setItem('flashcards', JSON.stringify(flashcards));
+    }
 
     function showFlashcard(index) {
         if (index < 0 || index >= flashcards.length) {
@@ -1980,25 +2061,62 @@ document.addEventListener('DOMContentLoaded', function() {
         container.querySelectorAll('.edit-flashcard-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const index = parseInt(this.dataset.index);
-                // TODO: Implement edit functionality (e.g., populate form, open modal)
-                showNotification('Edit', `Edit flashcard at index ${index}`, 'fa-edit');
+                editFlashcard(index); // Call edit function
             });
         });
         
         container.querySelectorAll('.delete-flashcard-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const index = parseInt(this.dataset.index);
-                deleteFlashcard(index);
+                deleteFlashcard(index); // Call delete function
             });
         });
+    }
+
+    function editFlashcard(index) {
+        editingFlashcardIndex = index;
+        const card = flashcards[index];
+        elements.editFlashcardFrontInput.value = card.front;
+        elements.editFlashcardBackInput.value = card.back;
+        elements.editFlashcardModal.classList.remove('hidden');
+    }
+
+    function saveFlashcardChanges() {
+        if (editingFlashcardIndex !== null) {
+            const updatedFront = elements.editFlashcardFrontInput.value.trim();
+            const updatedBack = elements.editFlashcardBackInput.value.trim();
+            
+            if (updatedFront && updatedBack) {
+                flashcards[editingFlashcardIndex] = { front: updatedFront, back: updatedBack };
+                saveFlashcards(); // Save changes
+                renderFlashcardList(); // Update list
+                elements.editFlashcardModal.classList.add('hidden');
+                showNotification('Flashcard Updated', 'The flashcard has been updated.', 'fa-check-circle');
+            } else {
+                showNotification('Input Required', 'Please ensure both question and answer are filled.', 'fa-exclamation-circle');
+            }
+        }
     }
 
     function deleteFlashcard(index) {
         if (confirm('Are you sure you want to delete this flashcard?')) {
             flashcards.splice(index, 1);
+            saveFlashcards(); // Save changes after deletion
             showNotification('Flashcard Deleted', 'The flashcard has been removed.', 'fa-trash');
             renderFlashcardList();
             // TODO: Also update the main flashcard viewer if necessary
+            // If the deleted card was the current one being viewed, reset the viewer
+            if (!elements.flashcardViewer.classList.contains('hidden') && index === currentFlashcardIndex) {
+                 currentFlashcardIndex = 0; // Or adjust based on new list length
+                 showFlashcard(currentFlashcardIndex); // Show the new first card
+            } else if (!elements.flashcardViewer.classList.contains('hidden') && index < currentFlashcardIndex) {
+                 currentFlashcardIndex--; // Adjust index if a card before the current one was deleted
+                 showFlashcard(currentFlashcardIndex); // Show the correct card at the adjusted index
+            } else if (!elements.flashcardViewer.classList.contains('hidden') && currentFlashcardIndex >= flashcards.length) {
+                 // If the last card was deleted and it was the current one, show the new last card or end message
+                 currentFlashcardIndex = Math.max(0, flashcards.length - 1);
+                 showFlashcard(currentFlashcardIndex); // Show the new last card or end message
+            }
         }
     }
 
@@ -2009,5 +2127,79 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Initial render of flashcard list on page load
-    renderFlashcardList();
+    // renderFlashcardList(); // This is now called by loadFlashcards
+
+    // Load flashcards from storage on startup
+    loadFlashcards();
+
+    // Add event listeners for edit modal
+    elements.closeEditFlashcardModal.addEventListener('click', function() {
+        elements.editFlashcardModal.classList.add('hidden');
+        editingFlashcardIndex = null; // Reset editing index
+    });
+
+    elements.saveFlashcardChangesBtn.addEventListener('click', saveFlashcardChanges);
+
+    // Initial call to updateCharts to set initial visibility and data
+    updateCharts();
+
+    // --- Custom Theme Selector Functionality ---
+    if (elements.customThemeSelector && elements.customThemeDisplay && elements.customThemeOptions.length > 0) {
+        // Toggle dropdown visibility
+        elements.customThemeDisplay.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent click from immediately closing dropdown
+            elements.customThemeSelector.classList.toggle('active');
+        });
+
+        // Handle option selection
+        elements.customThemeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const selectedTheme = this.dataset.value;
+                applyTheme(selectedTheme); // Apply theme visually
+                state.settings.theme = selectedTheme; // Update state
+                updateStorage(); // Save to local storage
+                
+                // Update display text and close dropdown
+                elements.selectedThemeName.textContent = this.textContent;
+                elements.customThemeOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                elements.customThemeSelector.classList.remove('active');
+            });
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!elements.customThemeSelector.contains(event.target)) {
+                elements.customThemeSelector.classList.remove('active');
+            }
+        });
+        
+        // Set initial selected theme display
+        const initialTheme = state.settings.theme || 'dark';
+        applyTheme(initialTheme); // Ensure theme is applied on load
+    }
+
+    // Daily Study Tip Functionality
+    const studyTips = [
+        "Break down large tasks into smaller, manageable steps.",
+        "Find a dedicated study space free from distractions.",
+        "Use active recall and spaced repetition techniques.",
+        "Teach the material to someone else to test your understanding.",
+        "Take regular short breaks to avoid burnout.",
+        "Stay hydrated and eat healthy snacks.",
+        "Review previous material periodically.",
+        "Prioritize your most challenging subjects.",
+        "Get enough sleep to improve memory consolidation.",
+        "Test yourself frequently with practice questions."
+    ];
+
+    function displayRandomStudyTip() {
+        const randomIndex = Math.floor(Math.random() * studyTips.length);
+        elements.studyTipText.textContent = studyTips[randomIndex];
+    }
+
+    // Initial call to display a random tip on load
+    displayRandomStudyTip();
+
+    // End of DOMContentLoaded
 });
