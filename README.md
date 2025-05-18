@@ -39,10 +39,3 @@ The Ultimate Exam Progress Tracker Pro is a dynamic and interactive web applicat
 - Confetti.js (for achievement celebrations)
 - Font Awesome (for icons)
 
-## Contributing
-
-Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, feel free to fork the repository and submit a pull request.
-
-## License
-
-[Include license information here, e.g., MIT License]
